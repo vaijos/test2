@@ -1,0 +1,152 @@
+# This Deployment manifest defines:
+# - single-replica deployment of the container image, with label "app: network-ticketing-system"
+# - Pod exposes port 8080
+# - specify PORT environment variable to the container process
+# Syntax reference https://kubernetes.io/docs/concepts/configuration/overview/
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: network-ticketing-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: network-ticketing-system
+  template:
+    metadata:
+      labels:
+        app: network-ticketing-system
+    spec:
+      imagePullSecrets:
+        - name: gitlab-registry-key
+      containers:
+      - name: server
+        image: "registry.gitlab.visible.com/Microservices/network-ticketing-system"
+        resources:
+          limits:
+            cpu: 1024m
+            memory: 1Gi
+          requests:
+            cpu: 512m
+            memory: 512Mi
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PORT
+          value: "8080"
+        # Example usage of config map
+        # - name: <config_map_varname>
+        #   valueFrom:
+        #     configMapKeyRef:
+        #       name: <config_map_name>
+        #       key: <config_map_key>
+        - name: 'spring.data.env'
+          valueFrom:
+            configMapKeyRef:
+              name: 'network-ticketing-system-config'
+              key: 'environment'
+        - name: 'db.clientCertPath'
+          valueFrom:
+            configMapKeyRef:
+              name: 'network-ticketing-system-config'
+              key: 'db_clientCertPath'          
+        - name: 'db.clientKeyPath'
+          valueFrom:
+            configMapKeyRef:
+              name: 'network-ticketing-system-config'
+              key: 'db_clientKeyPath'              
+        - name: 'db.rootCaPath'
+          valueFrom:
+            configMapKeyRef:
+              name: 'network-ticketing-system-config'
+              key: 'db_rootCaPath'                                                                                        
+        - name: 'service.care-service-properties.host'
+          valueFrom:
+            configMapKeyRef:
+              name: 'network-ticketing-system-config'
+              key: 'care_service_end_point'                                                                                        
+        - name: 'service.care-service-properties.x-auth'
+          valueFrom:
+            configMapKeyRef:
+              name: 'network-ticketing-system-config'
+              key: 'care_service_x-auth'                                                                                        
+        - name: 'vmb.topic'
+          valueFrom:
+            configMapKeyRef:
+              name: 'network-ticketing-system-config'
+              key: 'vmb_topic'                   
+        - name: 'vmb.paths.tlsCertFilePath'
+          valueFrom:
+            configMapKeyRef:
+              name: 'network-ticketing-system-config'
+              key: 'vmb_path_tlsCertFilePath'                   
+        - name: 'vmb.paths.tlsKeyFilePath'
+          valueFrom:
+            configMapKeyRef:
+              name: 'network-ticketing-system-config'
+              key: 'vmb_path_tlsKeyFilePath'                   
+        - name: 'vmb.parhs.certificatePath'
+          valueFrom:
+            configMapKeyRef:
+              name: 'network-ticketing-system-config'
+              key: 'vmb_paths_certificatePath'                   
+        - name: 'vmb.paths.pubKeyPath'
+          valueFrom:
+            configMapKeyRef:
+              name: 'network-ticketing-system-config'
+              key: 'vmb_paths_pubKeyPath'                   
+        - name: 'vmb.privKeyPath'
+          valueFrom:
+            configMapKeyRef:
+              name: 'network-ticketing-system-config'
+              key: 'vmb_paths_privKeyPath'                   
+        - name: 'vmb.serviceUrl'
+          valueFrom:
+            configMapKeyRef:
+              name: 'network-ticketing-system-config'
+              key: 'vmb_serviceUrl'                   
+        - name: 'vmb.authenticationTls'
+          valueFrom:
+            configMapKeyRef:
+              name: 'network-ticketing-system-config'
+              key: 'vmb_authenticationTls'   
+        - name: 'vmb.backupServiceUrl'
+          valueFrom:
+            configMapKeyRef:
+              name: 'network-ticketing-system-config'
+              key: 'vmb_backupServiceUrl'        
+        - name: 'service.nrb-service-properties.host'
+          valueFrom:
+            configMapKeyRef:
+              name: 'network-ticketing-system-config'
+              key: 'nrb_service_end_point'                                                                                        
+        - name: 'service.nrb-service-properties.ipgv-impact-apikey'
+          valueFrom:
+            configMapKeyRef:
+              name: 'network-ticketing-system-config'
+              key: 'nrb_service_ipgv_impact_apikey'                                                                                        
+
+        ##volume specifications
+        - name: "GOOGLE_APPLICATION_CREDENTIALS"
+          value: "/var/run/secret/cloud.google.com/dialogflow-key.json"
+        - name: "GCS_CREDENTIALS"
+          value: "/etc/secrets/google/gcs/gcs-key.json" 
+        volumeMounts:
+          - name: "dialog-service-account"
+            mountPath: "/var/run/secret/cloud.google.com"
+          - name: "gcs-service-account"
+            mountPath: "/etc/secrets/google/gcs"
+
+      volumes:
+        - name: "dialog-service-account"
+          secret:
+            secretName: "dialogflow-key"
+        - name: "gcs-service-account"
+          secret:
+            secretName: "gcs-key"
+            items:
+              - key: gcs-key.json
+                path: gcs-key.json
+            
+                         
+                                                                                                                                                                                       

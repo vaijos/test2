@@ -1,0 +1,25 @@
+# This Service manifest defines:
+# - a load balancer for pods matching label "app: network-ticketing-system"
+# - exposing the application to the public Internet (type:ClusterIP)
+# - routes port 80 of the load balancer to the port 8080 of the Pods.
+# Syntax reference https://kubernetes.io/docs/concepts/configuration/overview/
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    cloud.google.com/load-balancer-type: Internal
+  finalizers:
+  - service.kubernetes.io/load-balancer-cleanup
+  name: network-ticketing-system
+  labels:
+    app: network-ticketing-system
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: network-ticketing-system
+  sessionAffinity: None
+  type: LoadBalancer

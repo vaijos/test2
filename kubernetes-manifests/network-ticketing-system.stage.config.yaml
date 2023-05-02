@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: network-ticketing-system-config
+  
+data:
+  environment: 'stage'
+  care_service_end_point: 'https://api.stage.bevisible.com/v1/care'
+  care_service_x-auth : "gGumYlb2BCoAVNSfEH53UCiAldUH"
+  db_clientCertPath : "dbcert/preprod/client-cert.pem"
+  db_clientKeyPath : "dbcert/preprod/clientkey.pk8"
+  db_rootCaPath : "dbcert/preprod/server-ca.pem"
+  sm_project : "vz-it-thinair-np-preprod"
+  sm_gcsKeyPath : "/etc/secrets/google/gcs/gcs-key.json"
+

@@ -1,0 +1,42 @@
+# This Deployment manifest defines:
+# - single-replica deployment of the container image, with label "app: network-ticketing-system"
+# - Pod exposes port 8080
+# - specify PORT environment variable to the container process
+# Syntax reference https://kubernetes.io/docs/concepts/configuration/overview/
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $NAME
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: $NAME
+  template:
+    metadata:
+      labels:
+        app: $NAME
+    spec:
+      imagePullSecrets:
+        - name: gitlab-registry-key
+      containers:
+      - name: server
+        image: "registry.gitlab.visible.com/Microservices/network-ticketing-system"
+        resources:
+          limits:
+            cpu: 1024m
+            memory: 1Gi
+          requests:
+            cpu: 512m
+            memory: 512Mi
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PORT
+          value: "8080"
+        # Example usage of config map
+        # - name: <config_map_varname>
+        #   valueFrom:
+        #     configMapKeyRef:
+        #       name: <config_map_name>
+        #       key: <config_map_key>

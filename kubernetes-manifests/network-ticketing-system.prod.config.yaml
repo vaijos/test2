@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: network-ticketing-system-config
+  
+data:
+  environment: 'prod'
+  care_service_end_point: 'https://api.bevisible.com/v1/care'
+  care_service_x-auth : "00D22000000DLiv!AQgAQAQzdq3vXp.KrVBM_OGNTOhyTdkf3_669njJukamnip1sGwIjaIhw41vXu0FDxWcSpMUrFFpqhNiYAQSBIyozbtdk3fU"
+  db_clientCertPath : "dbcert/prod/client-cert.pem"
+  db_clientKeyPath : "dbcert/prod/clientkey.pk8"
+  db_rootCaPath : "dbcert/prod/server-ca.pem"
+  vmb_topic : "persistent://aavb/sa-nrb/vRepairCore-SA-NRB-Care-1ms"
+  vmb_path_tlsCertFilePath : "vmbcerts/giuv.cert.pem"
+  vmb_path_tlsKeyFilePath : "vmbcerts/giuv.key-pk8.pem"
+  vmb_paths_certificatePath : "vmbcerts/ca.cert.pem"
+  vmb_paths_pubKeyPath : "vmbcerts/care_vmb_pubkey.pem"
+  vmb_paths_privKeyPath : "vmbcerts/care_vmb_privkey.pem"
+  vmb_serviceUrl : "pulsar+ssl://vmb-aws-us-east-1-prod.verizon.com:6651/"
+  vmb_authenticationTls : "org.apache.pulsar.client.impl.auth.AuthenticationTls"
+  vmb_backupServiceUrl : "pulsar+ssl://10.118.227.126:6651/"
+  nrb_service_end_point : "https://oa.verizon.com"
+  nrb_service_ipgv_impact_apikey : "vfb8tnW58wQSPAVx2Id303fDvXRauVOs"
+

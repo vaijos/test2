@@ -1,0 +1,59 @@
+# This Deployment manifest defines:
+# - single-replica deployment of the container image, with label "app: network-ticketing-system"
+# - Pod exposes port 8080
+# - specify PORT environment variable to the container process
+# Syntax reference https://kubernetes.io/docs/concepts/configuration/overview/
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: network-ticketing-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: network-ticketing-system
+  template:
+    metadata:
+      labels:
+        app: network-ticketing-system
+    spec:
+      imagePullSecrets:
+        - name: gitlab-registry-key
+      containers:
+      - name: server
+        image: "registry.gitlab.visible.com/Microservices/network-ticketing-system"
+        resources:
+          limits:
+            cpu: 1024m
+            memory: 1Gi
+          requests:
+            cpu: 512m
+            memory: 512Mi
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PORT
+          value: "8080"
+
+        # COMMON GCS - End
+        - name: "GOOGLE_APPLICATION_CREDENTIALS"
+          value: "/var/run/secret/cloud.google.com/dialogflow-key.json"
+        - name: "GCS_CREDENTIALS"
+          value: "/etc/secrets/google/gcs/gcs-key.json" 
+        volumeMounts:
+          - name: "dialog-service-account"
+            mountPath: "/var/run/secret/cloud.google.com"
+          - name: "gcs-service-account"
+            mountPath: "/etc/secrets/google/gcs"
+
+      volumes:
+        - name: "dialog-service-account"
+          secret:
+            secretName: "dialogflow-key"
+        - name: "gcs-service-account"
+          secret:
+            secretName: "gcs-key"
+            items:
+              - key: gcs-key.json
+                path: gcs-key.json
+
