@@ -1,0 +1,113 @@
+apiVersion: skaffold/v2beta8
+kind: Config
+build:
+  tagPolicy:
+    customTemplate:
+      template: "{{.GITCOMMIT}}_{{.DATE}}"
+      components:
+      - name: DATE
+        dateTime:
+          format: "2006-01-02"
+          timezone: "UTC"
+      - name: GITCOMMIT
+        gitCommit:
+          variant: AbbrevCommitSha  
+  # defines where to find the code at build time and where to push the resulting image
+  artifacts:
+  - context: .
+    image: "registry.gitlab.visible.com/microservices/network-ticketing-system"
+    docker:
+      network: host
+# defines the Kubernetes manifests to deploy on each run
+deploy:
+  kubectl:
+    manifests:
+    - ./kubernetes-manifests/network-ticketing-system.minikube.config.yaml
+    - ./kubernetes-manifests/network-ticketing-system.service.yaml
+    - ./kubernetes-manifests/network-ticketing-system.dev.deployment.yaml
+
+# use the cloudbuild profile to build images using Google Cloud Build
+profiles:
+  - name: cloudbuild
+    build:
+      googleCloudBuild: {}
+  - name: stage
+    build:
+      tagPolicy:
+        customTemplate:
+          template: "{{.GITCOMMIT}}_{{.DATE}}"
+          components:
+          - name: DATE
+            dateTime:
+              format: "2006-01-02"
+              timezone: "UTC"
+          - name: GITCOMMIT
+            gitCommit:
+              variant: AbbrevCommitSha    
+      artifacts:
+        - context: .
+          image: "registry.gitlab.visible.com/microservices/network-ticketing-system"
+          docker:
+            network: host
+            buildArgs:
+              config: conf/network-ticketing-system.test.yaml
+    deploy:
+        kubectl:
+          manifests:
+            - ./kubernetes-manifests/network-ticketing-system.stage.config.yaml
+            - ./kubernetes-manifests/network-ticketing-system.service.yaml
+            - ./kubernetes-manifests/network-ticketing-system.stage.deployment.yaml
+
+  - name: prod
+    build:
+      tagPolicy:
+        customTemplate:
+          template: "{{.GITCOMMIT}}_{{.DATE}}"
+          components:
+          - name: DATE
+            dateTime:
+              format: "2006-01-02"
+              timezone: "UTC"
+          - name: GITCOMMIT
+            gitCommit:
+              variant: AbbrevCommitSha    
+      artifacts:
+        - context: .
+          image: "registry.gitlab.visible.com/microservices/network-ticketing-system"
+          docker:
+            network: host
+            buildArgs:
+              config: conf/network-ticketing-system.test.yaml
+    deploy:
+        kubectl:
+          manifests:
+            - ./kubernetes-manifests/network-ticketing-system.prod.config.yaml
+            - ./kubernetes-manifests/network-ticketing-system.service.yaml
+            - ./kubernetes-manifests/network-ticketing-system.prod.deployment.yaml
+
+  - name: dev
+    build:
+      tagPolicy:
+        customTemplate:
+          template: "{{.GITCOMMIT}}_{{.DATE}}"
+          components:
+          - name: DATE
+            dateTime:
+              format: "2006-01-02"
+              timezone: "UTC"
+          - name: GITCOMMIT
+            gitCommit:
+              variant: AbbrevCommitSha    
+      artifacts:
+        - context: .
+          image: "registry.gitlab.visible.com/microservices/network-ticketing-system"
+          docker:
+            network: host
+            buildArgs:
+              config: conf/network-ticketing-system.test.yaml
+    deploy:
+        kubectl:
+          manifests:
+            - ./kubernetes-manifests/network-ticketing-system.dev.config.yaml
+            - ./kubernetes-manifests/network-ticketing-system.service.yaml
+            - ./kubernetes-manifests/network-ticketing-system.dev.deployment.yaml
